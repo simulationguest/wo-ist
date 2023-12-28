@@ -57,8 +57,10 @@
 
 <main class="max-w-7xl flex flex-col gap-4">
 	{#if state == State.LOCATION_UNKNOWN}
-		<h1>Wo bist <span class="text-green-500">du</span>?</h1>
-		<p class="text-center">Gib mal Standort ;)</p>
+		<h1>Suche Standort</h1>
+		<div
+			class="mx-auto w-12 h-12 rounded-full border-8 border-slate-300 dark:border-slate-800 border-t-green-600 dark:border-t-green-500 animate-spin"
+		/>
 	{:else if state == State.FETCHING}
 		<h1>Einen Moment ...</h1>
 		<div
