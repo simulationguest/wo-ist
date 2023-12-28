@@ -6,6 +6,7 @@
 	import load_where, { type Amenity } from '$lib/load';
 	import Tag from './Tag.svelte';
 	import ArrowRight from './ArrowRight.svelte';
+	import ArrowLeft from './ArrowLeft.svelte';
 
 	const amenity = $page.url.searchParams.get('amenity');
 
@@ -79,14 +80,22 @@
 	}
 </script>
 
+
 <main class="max-w-5xl flex flex-col gap-4 w-full">
+	<a href="/" class="text-slate-800 dark:text-slate-500 flex flex-row items-center w-full justify-start gap-2 mb-4">
+		<ArrowLeft className="stroke-slate-700 dark:stroke-slate-400"></ArrowLeft>
+		Zurück bitte
+	</a>
+
 	{#if state == State.LOCATION_UNKNOWN}
 		<h1>Suche Standort</h1>
+		<p class="text-center mb-4">Wo bist du denn??</p>
 		<div
 			class="mx-auto w-12 h-12 rounded-full border-8 border-slate-300 dark:border-slate-800 border-t-green-600 dark:border-t-green-500 animate-spin"
 		/>
 	{:else if state == State.FETCHING}
 		<h1>Einen Moment ...</h1>
+		<p class="text-center mb-4">Wir hams gleich</p>
 		<div
 			class="mx-auto w-12 h-12 rounded-full border-8 border-slate-300 dark:border-slate-800 border-t-green-600 dark:border-t-green-500 animate-spin"
 		/>
@@ -97,11 +106,16 @@
 		>
 	{:else if state == State.DONE && amenities.length > 0}
 		<h1>Sodala :)</h1>
+		<p class="text-center">Frohes Finden</p>
 		<div
 			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
 		>
 			{#each amenities as a}
-				<a class="px-5 py-4 flex flex-row items-center gap-4" target="_blank" href={makeUrl(a.lat, a.lon)}>
+				<a
+					class="px-5 py-4 flex flex-row items-center gap-4"
+					target="_blank"
+					href={makeUrl(a.lat, a.lon)}
+				>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
 						<h2 class="text-xl">{tr(amenity)}</h2>
