@@ -65,7 +65,7 @@
 		);
 	}
 
-	const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+	const isSafari = browser && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 	function makeUrl(lat: number, lon: number) {
 		if (isSafari) {
 			return `https://maps.apple.com/?daddr=${lat},${lon}`;
