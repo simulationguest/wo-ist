@@ -65,6 +65,14 @@
 		);
 	}
 
+	const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+	function makeUrl(lat: number, lon: number) {
+		if (isSafari) {
+			return `https://maps.apple.com/?daddr=${lat},${lon}`;
+		}
+		return `https://www.google.com/maps/place/${lat},${lon}`;
+	}
+
 	if (browser && state == State.LOCATION_UNKNOWN) {
 		fetch();
 	}
@@ -92,7 +100,7 @@
 			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
 		>
 			{#each amenities as a}
-				<a class="px-4 py-3 flex flex-row items-center gap-3" href="#">
+				<a class="px-4 py-3 flex flex-row items-center gap-3" target="_blank" href={makeUrl(a.lat, a.lon)}>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
 						<h2 class="text-xl">{tr(amenity)}</h2>
