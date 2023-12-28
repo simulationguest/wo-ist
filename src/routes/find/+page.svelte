@@ -28,6 +28,21 @@
 
 	function fetch() {
 		state = State.LOCATION_UNKNOWN;
+		if (navigator.permissions && navigator.permissions.query) {
+			navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
+				const permission = result.state;
+				if (permission === 'granted' || permission === 'prompt') {
+					getLocation();
+					return;
+				}
+				state = State.LOCATION_ERROR;
+			});
+		} else if (navigator.geolocation) {
+			getLocation();
+		}
+	}
+
+	function getLocation() {
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
 				state = State.FETCHING;
@@ -55,7 +70,7 @@
 	}
 </script>
 
-<main class="max-w-7xl flex flex-col gap-4 w-full">
+<main class="max-w-5xl flex flex-col gap-4 w-full">
 	{#if state == State.LOCATION_UNKNOWN}
 		<h1>Suche Standort</h1>
 		<div
@@ -71,10 +86,10 @@
 		<button on:click={fetch} class="mx-auto rounded px-6 py-3 bg-green-500 text-white"
 			>Vielleicht gehts jetzt</button
 		>
-	{:else if state == State.DONE}
-		<!-- <h1>Sodala :)</h1> -->
+	{:else if state == State.DONE && amenities.length > 0}
+		<h1>Sodala :)</h1>
 		<div
-			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600"
+			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
 		>
 			{#each amenities as a}
 				<a class="px-4 py-3 flex flex-row items-center gap-3" href="#">
@@ -93,6 +108,8 @@
 				</a>
 			{/each}
 		</div>
+	{:else if state == State.DONE && amenities.length == 0}
+		<h1>Nix gefunden</h1>
 	{:else if state == State.BAD_REQUEST}
 		<h1>Irgendwas ist schiefgelaufen :(</h1>
 		<p class="text-center">Das sollte eigentlich nicht passieren.</p>
