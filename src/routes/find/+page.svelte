@@ -5,6 +5,7 @@
 	import { error } from '@sveltejs/kit';
 	import load_where, { type Amenity } from '$lib/load';
 	import Tag from './Tag.svelte';
+	import ArrowRight from './ArrowRight.svelte';
 
 	const amenity = $page.url.searchParams.get('amenity');
 
@@ -100,18 +101,21 @@
 			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
 		>
 			{#each amenities as a}
-				<a class="px-4 py-3 flex flex-row items-center gap-3" target="_blank" href={makeUrl(a.lat, a.lon)}>
+				<a class="px-5 py-4 flex flex-row items-center gap-4" target="_blank" href={makeUrl(a.lat, a.lon)}>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
 						<h2 class="text-xl">{tr(amenity)}</h2>
 						{#if a.operator}
-							<p>{a.operator}</p>
+							<p class="mb-1">{a.operator}</p>
 						{/if}
 						<div class="flex flex-row flex-wrap items-center gap-2">
 							{#each a.tags as tag}
 								<Tag name={tag}>{tag}</Tag>
 							{/each}
 						</div>
+					</div>
+					<div class="ml-auto self-start">
+						<ArrowRight className="stroke-slate-800 dark:stroke-slate-500"></ArrowRight>
 					</div>
 				</a>
 			{/each}
