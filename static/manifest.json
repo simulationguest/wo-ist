@@ -1,7 +1,7 @@
 {
 	"name": "Wo ist",
 	"short_name": "wo-ist",
-	"theme_color": "#16a34a",
+	"theme_color": "#0f172a",
 	"background_color": "#0f172a",
 	"display": "standalone",
 	"orientation": "portrait",
