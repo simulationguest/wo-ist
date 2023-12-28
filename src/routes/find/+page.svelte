@@ -55,7 +55,7 @@
 	}
 </script>
 
-<main class="max-w-7xl flex flex-col gap-4">
+<main class="max-w-7xl flex flex-col gap-4 w-full">
 	{#if state == State.LOCATION_UNKNOWN}
 		<h1>Suche Standort</h1>
 		<div
