@@ -5,6 +5,7 @@
 			<option value="drinking_water"> Trinkwasser </option>
 			<option value="toilet"> eine Toilette </option>
 			<option value="atm"> Bankautomat </option>
+			<option value="pub">Pub</option>
 		</select>
 		in der Nähe?
 	</p>

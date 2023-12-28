@@ -1,4 +1,4 @@
-export const amenities = ['drinking_water', 'toilet', 'atm'] as const;
+export const amenities = ['drinking_water', 'toilet', 'atm', 'pub'] as const;
 
 export type AmenityKey = (typeof amenities)[number];
 
@@ -12,12 +12,14 @@ export const translations: {
 	en: {
 		atm: 'ATM',
 		drinking_water: 'Drinking water',
-		toilet: 'toilet'
+		toilet: 'toilet',
+		pub: 'Irish pub'	
 	},
 	de: {
 		atm: 'Geldautomat',
 		drinking_water: 'Trinkwasser',
-		toilet: 'Toilette'
+		toilet: 'Toilette',
+		pub: 'Irish Pub'
 	}
 };
 

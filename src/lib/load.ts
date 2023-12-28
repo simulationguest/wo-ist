@@ -28,6 +28,9 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 		case 'toilet':
 			queryBody = `nwr${filterAccess}[amenity=toilets];`;
 			break;
+		case 'pub':
+			queryBody = `nwr${filterAccess}[amenity=pub];`;
+			break;
 		case 'atm':
 			queryBody = `( nwr${filterAccess}[amenity=atm]; nwr${filterAccess}[amenity=bank]; );`;
 			break;
@@ -89,6 +92,11 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 					
 				if (el.tags.changing_table === 'yes') {
 					amenity.tags.push(Tag.ChangingTable);
+				}
+				break;
+			case 'pub':
+				if (el.tags.theme = 'irish') {
+					amenity.tags.push("Irish Themed");
 				}
 				break;
 			case 'atm':
