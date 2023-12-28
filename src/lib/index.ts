@@ -1,12 +1,12 @@
 export const amenities = ['drinking_water', 'toilet', 'atm'] as const;
 
-export type AmenityKey = typeof amenities[number];
+export type AmenityKey = (typeof amenities)[number];
 
 export const languages = ['de', 'en'] as const;
 
 export const translations: {
 	[key in (typeof languages)[number]]: {
-		[key in (typeof amenities)[number]]: string;
+		[key in AmenityKey]: string;
 	};
 } = {
 	en: {
@@ -20,3 +20,7 @@ export const translations: {
 		toilet: 'Toilette'
 	}
 };
+
+export function tr(key: AmenityKey): string {
+	return translations['de'][key];
+}

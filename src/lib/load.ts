@@ -1,34 +1,19 @@
-import { type AmenityKey } from "$lib";
+import { type AmenityKey } from '$lib';
 
 export interface Amenity {
-	lat: number,
-	lon: number,
+	lat: number;
+	lon: number;
 	distance: number;
-	wheelchair_friendy?: boolean,
-	operator?: string,
-	tags: DrinkingWater | Toilet | ATM | null,
+	operator?: string;
+	tags: string[];
 }
 
-interface DrinkingWater {
-	type: "drinking_water",
-	explicitly_legal?: boolean,
-	bottle_refill?: boolean,
-	bottle_friendly?: boolean
-}
-
-interface Toilet {
-	type: "toilet",
-	charge: string | null,
-	genders: ReturnType<typeof toilet_genders>,
-	change_table?: boolean,
-}
-
-interface ATM {
-	type: "atm",
-	category: "Bank" | "ATM",
-	who?: string;
-	cash_in?: boolean,
-	expensive?: boolean,
+enum Tag {
+	ExplicitlyLegal = 'Legal',
+	BottleRefill = 'Bottle Refill',
+	Bottle = 'Bottle',
+	ChangingTable = "Changing Table",
+	CashIn = "Cash In",
 }
 
 export default async function load_where(lat: number, lon: number, type: AmenityKey) {
@@ -37,22 +22,22 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 
 	let queryBody;
 	switch (type) {
-		case "drinking_water":
+		case 'drinking_water':
 			queryBody = `nwr${filterAccess}[amenity="drinking_water"];`;
 			break;
-		case "toilet":
-			queryBody = `nwr${filterAccess}[amenity=toilets];`
+		case 'toilet':
+			queryBody = `nwr${filterAccess}[amenity=toilets];`;
 			break;
-		case "atm":
+		case 'atm':
 			queryBody = `( nwr${filterAccess}[amenity=atm]; nwr${filterAccess}[amenity=bank]; );`;
 			break;
 	}
 
 	queryBody = `[out:json];${queryBody}out center;`;
 
-	const res = await fetch("https://overpass-api.de/api/interpreter", {
-		method: "post",
-		body: queryBody,
+	const res = await fetch('https://overpass-api.de/api/interpreter', {
+		method: 'post',
+		body: queryBody
 	});
 	const data = await res.json();
 
@@ -67,44 +52,53 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 		const elLon = el.lon ?? el.center.lon;
 
 		let wheelchair_friendy;
-		if (el.tags.wheelchair === "yes") wheelchair_friendy = true;
-		else if (el.tags.wheelchair === "no") wheelchair_friendy = false;
+		if (el.tags.wheelchair === 'yes') wheelchair_friendy = true;
+		else if (el.tags.wheelchair === 'no') wheelchair_friendy = false;
 
 		let amenity: Amenity = {
 			lat: elLat,
 			lon: elLon,
 			distance: distance(lat, lon, elLat, elLon),
-			wheelchair_friendy,
 			operator: el.tags.operator,
-			tags: null
-		}
+			tags: []
+		};
+
+
+		if (el.tags.wheelchair === 'yes') amenity.tags.push("Wheelchair friendly");
+		else if (el.tags.wheelchair === 'no') amenity.tags.push("Wheelchair unfriendly");
 
 		switch (type) {
-			case "drinking_water":
-				amenity.tags = {
-					type,
-					explicitly_legal: el.tags["drinking_water:legal"] === "yes",
-					bottle_refill: el.tags.fountain === "bottle_refill",
-					bottle_friendly: el.tags.bottle === "yes",
+			case 'drinking_water':
+				if (el.tags['drinking_water:legal'] === 'yes') {
+					amenity.tags.push(Tag.ExplicitlyLegal);
+				}
+				if (el.tags.fountain === 'bottle_refill') {
+					amenity.tags.push(Tag.BottleRefill);
+				}
+				if (el.tags.bottle === 'yes') {
+					amenity.tags.push(Tag.Bottle);
 				}
 				break;
-			case "toilet":
-				amenity.tags = {
-					type,
-					charge: charge(el.tags),
-					genders: toilet_genders(el.tags),
-					change_table: el.tags.changing_table === "yes",
+			case 'toilet':
+				if (el.tags.charge || el.tags.free) {
+					amenity.tags.push(el.tags.charge || el.tags.free);
+				}
+				Object.entries(toilet_genders(el.tags))
+					.filter(([key, val]) => !!val)
+					.forEach(([key]) => amenity.tags.push(key));
+					
+				if (el.tags.changing_table === 'yes') {
+					amenity.tags.push(Tag.ChangingTable);
 				}
 				break;
-			case "atm":
-				let who = el.tags.brand || el.tags.operator || el.tags.name;
-				amenity.operator = undefined;
-				amenity.tags = {
-					type,
-					category: el.tags.amenity === "atm" ? "ATM" : "Bank",
-					who,
-					cash_in: el.tags.cash_in === "yes",
-					expensive: who.match("Euronet"),
+			case 'atm':
+				amenity.operator = el.tags.brand || el.tags.operator || el.tags.name;
+				amenity.tags.push(el.tags.amenity === 'atm' ? 'ATM' : 'Bank');
+				if (el.tags.cash_in === 'yes') {
+					amenity.tags.push(Tag.CashIn);
+				}
+				if (amenity.operator?.match('Euronet')) {
+					amenity.tags.push("Expensive");
 				}
 		}
 
@@ -117,14 +111,14 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 }
 
 function toilet_genders(tags: any) {
-	const unisex = tags.unisex ? tags.unisex === "yes" : null;
-	const segregated = tags.gender_segregated === "yes";
+	const unisex = tags.unisex ? tags.unisex === 'yes' : null;
+	const segregated = tags.gender_segregated === 'yes';
 	let both = segregated && unisex;
 	return {
-		male: both || (tags.male ? tags.male === "yes" : null),
-		female: both || (tags.female ? tags.female === "yes" : null),
-		unisex: !segregated && unisex,
-	}
+		male: both || (tags.male ? tags.male === 'yes' : null),
+		female: both || (tags.female ? tags.female === 'yes' : null),
+		unisex: !segregated && unisex
+	};
 }
 
 function distance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -145,12 +139,12 @@ function distance(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 function charge(tags: any) {
-	if (tags.fee === "no") return "free";
+	if (tags.fee === 'no') return 'free';
 	const charge = tags.charge;
 	if (!charge) {
-		if (tags.fee === "yes") return "not free";
+		if (tags.fee === 'yes') return 'not free';
 		return null;
 	}
-	const [value, currency] = charge.split(" ");
-	return new Intl.NumberFormat([...navigator.languages], { style: "currency", currency }).format(value);
+	const [value, currency] = charge.split(' ');
+	return new Intl.NumberFormat('de-DE', { style: 'currency', currency }).format(value);
 }
