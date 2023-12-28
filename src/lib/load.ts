@@ -31,6 +31,12 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 		case 'pub':
 			queryBody = `nwr${filterAccess}[amenity=pub];`;
 			break;
+		case 'megges':
+			queryBody = `nwr${filterAccess}[amenity=fast_food][brand="McDonald's"];`
+			break;
+		case 'pizza':
+			queryBody = `nwr${filterAccess}[cuisine=pizza];`
+			break;
 		case 'atm':
 			queryBody = `( nwr${filterAccess}[amenity=atm]; nwr${filterAccess}[amenity=bank]; );`;
 			break;

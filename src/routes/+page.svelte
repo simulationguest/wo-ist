@@ -6,6 +6,8 @@
 			<option value="toilet"> eine Toilette </option>
 			<option value="atm"> Bankautomat </option>
 			<option value="pub">Pub</option>
+			<option value="pizza">Pizza</option>
+			<option value="megges">McDonalds</option>
 		</select>
 		in der Nähe?
 	</p>
