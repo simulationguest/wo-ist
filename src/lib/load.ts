@@ -35,6 +35,8 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 		case 'atm':
 			queryBody = `( nwr${filterAccess}[amenity=atm]; nwr${filterAccess}[amenity=bank]; );`;
 			break;
+		case 'kebab':
+			queryBody = `nwr${filterAccess}[cuisine=kebab];`;
 	}
 
 	queryBody = `[out:json];${queryBody}out center;`;
@@ -83,7 +85,7 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 					amenity.tags.push(el.tags.charge || el.tags.free);
 				}
 				Object.entries(toilet_genders(el.tags))
-					.filter(([key, val]) => !!val)
+					.filter(([_, val]) => !!val)
 					.forEach(([key]) => amenity.tags.push(key));
 
 				if (el.tags.changing_table === 'yes') {

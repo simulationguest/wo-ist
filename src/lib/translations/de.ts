@@ -9,6 +9,7 @@ const DE = {
 			pub: 'ein Pub',
 			megges: 'McDonalds',
 			pizza: 'Pizza',
+			kebab: 'ein Döner',
 		},
 		in_proximity: 'in der Nähe?',
 		lets_go: 'Auf gehts!',
@@ -37,6 +38,7 @@ const DE = {
 		pub: 'Pub',
 		megges: 'McDonalds',
 		pizza: 'Pizza',
+		kebab: 'Döner',
 	},
 	findpage: {
 		go_back: ['Zurück bitte', 'halt stopp!'],
