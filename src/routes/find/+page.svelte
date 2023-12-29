@@ -20,7 +20,7 @@
 		DONE = 0,
 		ERROR = -1
 	}
-	var error = '';
+	let error = '';
 
 	let state = State.LOCATION_UNKNOWN;
 
