@@ -1,54 +1,59 @@
 import { page } from '$app/stores';
 import { get, writable } from 'svelte/store';
+import AppError from './error';
 
 export type Location = {
 	lat: number;
 	lon: number;
 };
 
-export const currentLocation = writable<{ location: Location; lastUpdated: number } | null>(null);
+type UserLocation = { location: Location; lastUpdated: number };
+
+export const currentLocation = writable<Promise<UserLocation>>(fetchLocation());
 
 export enum LocationError {
 	PermissionDenied = 'permission denied',
 	NoGeolocationAPI = 'no geolocation api',
-	FailedToFetch = 'failed to fetch'
+	FailedToFetch = 'failed to fetch',
 }
 
-async function fetchLocation(): Promise<Location> {
+async function fetchLocation(): Promise<UserLocation> {
+	console.log("Called")
 	if (navigator.permissions && navigator.permissions.query) {
 		const permission = await navigator.permissions.query({ name: 'geolocation' });
 		if (permission.state == 'denied') {
-			return Promise.reject(LocationError.PermissionDenied);
+			return Promise.reject(AppError.LocationPermissionDenied);
 		}
 	}
 	if (!navigator.geolocation) {
-		return Promise.reject(LocationError.NoGeolocationAPI);
+		throw AppError.NoGPSAPI;
 	}
 	return new Promise((resolve, reject) => {
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
 				resolve({
-					lat: pos.coords.latitude,
-					lon: pos.coords.longitude
+					lastUpdated: Date.now(),
+					location: {
+						lat: pos.coords.latitude,
+						lon: pos.coords.longitude,
+					},
 				});
 			},
 			(err) => {
-				reject(err);
+				console.error('Failed to get location:', err);
+				reject(AppError.FailedToGetLocation);
 			},
-			{ enableHighAccuracy: true }
+			{ enableHighAccuracy: true },
 		);
 	});
 }
 
 export async function getLocation() {
-	const cached = get(currentLocation);
+	const cached = await get(currentLocation);
 	if (cached !== null && (Date.now() - cached.lastUpdated) / 1000 < 120) {
-		return cached.location;
+		return cached;
 	}
-	const location = await fetchLocation();
-	currentLocation.set({
-		lastUpdated: Date.now(),
-		location
-	});
-	return location;
+	const location = fetchLocation();
+	currentLocation.set(location);
+	return await location;
 }

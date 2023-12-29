@@ -22,10 +22,14 @@ export function tr(key: string): string {
 }
 
 function getLanguage() {
+	if (!navigator) return;
 	if (navigator.languages != undefined) {
 		// @ts-ignore;
-		return navigator.languages.map(x => x.trim().slice(0, 2)).find((id) => languages.includes(id)) || navigator.language;
-	};
+		return (
+			navigator.languages.map((x) => x.trim().slice(0, 2)).find((id) => languages.includes(id)) ||
+			navigator.language
+		);
+	}
 	return navigator.language;
 }
 

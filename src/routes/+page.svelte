@@ -1,5 +1,5 @@
 <script>
-	import { amenities } from '$lib';
+	import { amenities } from '$lib/amenities';
 	import { getLocation } from '$lib/location';
 	import { tr } from '$lib/translations/index';
 	import { onMount } from 'svelte';
@@ -20,7 +20,7 @@
 		</select>
 		{tr('homepage.in_proximity')}
 	</p>
-	<button type="submit" class="bg-green-600 text-white rounded-xl px-7 py-3">
+	<button type="submit" class="button">
 		{tr('homepage.lets_go')}
 	</button>
 </form>

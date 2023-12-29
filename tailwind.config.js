@@ -6,9 +6,9 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Inter var', 'Inter', ...defaultTheme.fontFamily.sans]
-			}
-		}
+				sans: ['Inter var', 'Inter', ...defaultTheme.fontFamily.sans],
+			},
+		},
 	},
-	plugins: []
+	plugins: [],
 };

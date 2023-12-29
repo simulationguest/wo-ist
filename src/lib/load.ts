@@ -1,4 +1,5 @@
-import { type AmenityKey } from '$lib';
+import { type AmenityKey } from '$lib/amenities';
+import AppError from './error';
 import type { Location } from './location';
 import { tr } from './translations';
 
@@ -10,7 +11,7 @@ export interface Amenity {
 	tags: string[];
 }
 
-export default async function load_where({ lat, lon }: Location, type: AmenityKey) {
+async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 	const filter = `(around:1000,${lat},${lon})`;
 	const filterAccess = `${filter}[access!=no][access!=private][access!=customers]`;
 
@@ -40,7 +41,7 @@ export default async function load_where({ lat, lon }: Location, type: AmenityKe
 
 	const res = await fetch('https://overpass-api.de/api/interpreter', {
 		method: 'post',
-		body: queryBody
+		body: queryBody,
 	});
 	const data = await res.json();
 
@@ -59,22 +60,22 @@ export default async function load_where({ lat, lon }: Location, type: AmenityKe
 			lon: elLon,
 			distance: distance(lat, lon, elLat, elLon),
 			operator: el.tags.operator,
-			tags: []
+			tags: [],
 		};
 
-		if (el.tags.wheelchair === 'yes') amenity.tags.push(tr("tags.wheelchair_friendly"));
-		else if (el.tags.wheelchair === 'no') amenity.tags.push(tr("tags.wheelchair_unfriendly"));
+		if (el.tags.wheelchair === 'yes') amenity.tags.push(tr('tags.wheelchair_friendly'));
+		else if (el.tags.wheelchair === 'no') amenity.tags.push(tr('tags.wheelchair_unfriendly'));
 
 		switch (type) {
 			case 'drinking_water':
 				if (el.tags['drinking_water:legal'] === 'yes') {
-					amenity.tags.push(tr("tags.explicitly_legal"));
+					amenity.tags.push(tr('tags.explicitly_legal'));
 				}
 				if (el.tags.fountain === 'bottle_refill') {
-					amenity.tags.push(tr("tags.bottle_refill"));
+					amenity.tags.push(tr('tags.bottle_refill'));
 				}
 				if (el.tags.bottle === 'yes') {
-					amenity.tags.push(tr("tags.bottle"));
+					amenity.tags.push(tr('tags.bottle'));
 				}
 				break;
 			case 'toilet':
@@ -86,22 +87,22 @@ export default async function load_where({ lat, lon }: Location, type: AmenityKe
 					.forEach(([key]) => amenity.tags.push(key));
 
 				if (el.tags.changing_table === 'yes') {
-					amenity.tags.push(tr("tags.changing_table"));
+					amenity.tags.push(tr('tags.changing_table'));
 				}
 				break;
 			case 'pub':
 				if ((el.tags.theme = 'irish')) {
-					amenity.tags.push(tr("tags.irish_themed"));
+					amenity.tags.push(tr('tags.irish_themed'));
 				}
 				break;
 			case 'atm':
 				amenity.operator = el.tags.brand || el.tags.operator || el.tags.name;
 				amenity.tags.push(el.tags.amenity === 'atm' ? 'ATM' : 'Bank');
 				if (el.tags.cash_in === 'yes') {
-					amenity.tags.push(tr("tags.cash_in"));
+					amenity.tags.push(tr('tags.cash_in'));
 				}
 				if (amenity.operator?.match('Euronet')) {
-					amenity.tags.push(tr("tags.expensive"));
+					amenity.tags.push(tr('tags.expensive'));
 				}
 		}
 
@@ -113,6 +114,15 @@ export default async function load_where({ lat, lon }: Location, type: AmenityKe
 	return results;
 }
 
+export default async function load_where(location: Location, type: AmenityKey) {
+	try {
+		return load_where_internal(location, type);
+	} catch (error) {
+		console.error('Failed to fetch ' + type);
+		throw AppError.FailedToFetchAmenities;
+	}
+}
+
 function toilet_genders(tags: any) {
 	const unisex = tags.unisex ? tags.unisex === 'yes' : null;
 	const segregated = tags.gender_segregated === 'yes';
@@ -120,7 +130,7 @@ function toilet_genders(tags: any) {
 	return {
 		male: both || (tags.male ? tags.male === 'yes' : null),
 		female: both || (tags.female ? tags.female === 'yes' : null),
-		unisex: !segregated && unisex
+		unisex: !segregated && unisex,
 	};
 }
 
