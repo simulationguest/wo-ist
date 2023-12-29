@@ -1,4 +1,4 @@
-export const amenities = ['drinking_water', 'toilet', 'atm', 'pub', 'pizza', 'megges', 'kebab'] as const;
+export const amenities = ['drinking_water', 'toilet', 'atm', 'pub', 'pizza', 'megges', 'kebab', 'trash'] as const;
 
 export type AmenityKey = (typeof amenities)[number];
 

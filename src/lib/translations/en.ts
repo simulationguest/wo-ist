@@ -12,6 +12,7 @@ const EN: Translation = {
 			megges: 'McDonalds',
 			pizza: 'Pizza',
 			kebab: 'Kebab',
+			trash: 'a trashcan',
 		},
 		in_proximity: 'nearby?',
 		lets_go: ["Let's go!", 'Alright!'],
@@ -41,6 +42,7 @@ const EN: Translation = {
 		megges: 'McDonalds',
 		pizza: 'Pizza',
 		kebab: 'Kebab',
+		trash: 'Trashcan',
 	},
 	findpage: {
 		go_back: 'Go back',

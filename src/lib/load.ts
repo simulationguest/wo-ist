@@ -37,6 +37,10 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 			break;
 		case 'kebab':
 			queryBody = `nwr${filterAccess}[cuisine=kebab];`;
+			break;
+		case 'trash':
+			queryBody = `( nwr${filterAccess}[amenity=waste_disposal]; nwr${filterAccess}[amenity=waste_basket]; );`
+			break;
 	}
 
 	queryBody = `[out:json];${queryBody}out center;`;
@@ -106,6 +110,7 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 				if (amenity.operator?.match('Euronet')) {
 					amenity.tags.push(tr('tags.expensive'));
 				}
+				break;
 		}
 
 		results.push(amenity);
