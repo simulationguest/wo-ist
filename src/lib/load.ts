@@ -1,4 +1,6 @@
 import { type AmenityKey } from '$lib';
+import type { Location } from './location';
+import { tr } from './translations';
 
 export interface Amenity {
 	lat: number;
@@ -8,15 +10,7 @@ export interface Amenity {
 	tags: string[];
 }
 
-enum Tag {
-	ExplicitlyLegal = 'Legal',
-	BottleRefill = 'Bottle Refill',
-	Bottle = 'Bottle',
-	ChangingTable = "Changing Table",
-	CashIn = "Cash In",
-}
-
-export default async function load_where(lat: number, lon: number, type: AmenityKey) {
+export default async function load_where({ lat, lon }: Location, type: AmenityKey) {
 	const filter = `(around:1000,${lat},${lon})`;
 	const filterAccess = `${filter}[access!=no][access!=private][access!=customers]`;
 
@@ -32,10 +26,10 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 			queryBody = `nwr${filterAccess}[amenity=pub];`;
 			break;
 		case 'megges':
-			queryBody = `nwr${filterAccess}[amenity=fast_food][brand="McDonald's"];`
+			queryBody = `nwr${filterAccess}[amenity=fast_food][brand="McDonald's"];`;
 			break;
 		case 'pizza':
-			queryBody = `nwr${filterAccess}[cuisine=pizza];`
+			queryBody = `nwr${filterAccess}[cuisine=pizza];`;
 			break;
 		case 'atm':
 			queryBody = `( nwr${filterAccess}[amenity=atm]; nwr${filterAccess}[amenity=bank]; );`;
@@ -60,10 +54,6 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 		const elLat = el.lat ?? el.center.lat;
 		const elLon = el.lon ?? el.center.lon;
 
-		let wheelchair_friendy;
-		if (el.tags.wheelchair === 'yes') wheelchair_friendy = true;
-		else if (el.tags.wheelchair === 'no') wheelchair_friendy = false;
-
 		let amenity: Amenity = {
 			lat: elLat,
 			lon: elLon,
@@ -72,20 +62,19 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 			tags: []
 		};
 
-
-		if (el.tags.wheelchair === 'yes') amenity.tags.push("Wheelchair friendly");
-		else if (el.tags.wheelchair === 'no') amenity.tags.push("Wheelchair unfriendly");
+		if (el.tags.wheelchair === 'yes') amenity.tags.push(tr("tags.wheelchair_friendly"));
+		else if (el.tags.wheelchair === 'no') amenity.tags.push(tr("tags.wheelchair_unfriendly"));
 
 		switch (type) {
 			case 'drinking_water':
 				if (el.tags['drinking_water:legal'] === 'yes') {
-					amenity.tags.push(Tag.ExplicitlyLegal);
+					amenity.tags.push(tr("tags.explicitly_legal"));
 				}
 				if (el.tags.fountain === 'bottle_refill') {
-					amenity.tags.push(Tag.BottleRefill);
+					amenity.tags.push(tr("tags.bottle_refill"));
 				}
 				if (el.tags.bottle === 'yes') {
-					amenity.tags.push(Tag.Bottle);
+					amenity.tags.push(tr("tags.bottle"));
 				}
 				break;
 			case 'toilet':
@@ -95,24 +84,24 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 				Object.entries(toilet_genders(el.tags))
 					.filter(([key, val]) => !!val)
 					.forEach(([key]) => amenity.tags.push(key));
-					
+
 				if (el.tags.changing_table === 'yes') {
-					amenity.tags.push(Tag.ChangingTable);
+					amenity.tags.push(tr("tags.changing_table"));
 				}
 				break;
 			case 'pub':
-				if (el.tags.theme = 'irish') {
-					amenity.tags.push("Irish Themed");
+				if ((el.tags.theme = 'irish')) {
+					amenity.tags.push(tr("tags.irish_themed"));
 				}
 				break;
 			case 'atm':
 				amenity.operator = el.tags.brand || el.tags.operator || el.tags.name;
 				amenity.tags.push(el.tags.amenity === 'atm' ? 'ATM' : 'Bank');
 				if (el.tags.cash_in === 'yes') {
-					amenity.tags.push(Tag.CashIn);
+					amenity.tags.push(tr("tags.cash_in"));
 				}
 				if (amenity.operator?.match('Euronet')) {
-					amenity.tags.push("Expensive");
+					amenity.tags.push(tr("tags.expensive"));
 				}
 		}
 
