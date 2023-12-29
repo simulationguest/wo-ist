@@ -1,4 +1,5 @@
 import { type AmenityKey } from '$lib';
+import type { Location } from './location';
 
 export interface Amenity {
 	lat: number;
@@ -16,7 +17,7 @@ enum Tag {
 	CashIn = "Cash In",
 }
 
-export default async function load_where(lat: number, lon: number, type: AmenityKey) {
+export default async function load_where({ lat, lon }: Location, type: AmenityKey) {
 	const filter = `(around:1000,${lat},${lon})`;
 	const filterAccess = `${filter}[access!=no][access!=private][access!=customers]`;
 
@@ -95,7 +96,7 @@ export default async function load_where(lat: number, lon: number, type: Amenity
 				Object.entries(toilet_genders(el.tags))
 					.filter(([key, val]) => !!val)
 					.forEach(([key]) => amenity.tags.push(key));
-					
+
 				if (el.tags.changing_table === 'yes') {
 					amenity.tags.push(Tag.ChangingTable);
 				}

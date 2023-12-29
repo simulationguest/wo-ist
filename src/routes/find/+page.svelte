@@ -1,88 +1,57 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
-	import { amenities as amenity_types, type AmenityKey, tr } from '$lib';
-	import { error } from '@sveltejs/kit';
+	import { amenities as amenity_types, type AmenityKey } from '$lib';
+	import { tr } from '$lib/translations';
 	import load_where, { type Amenity } from '$lib/load';
 	import Tag from './Tag.svelte';
 	import ArrowRight from './ArrowRight.svelte';
 	import ArrowLeft from './ArrowLeft.svelte';
+	import Loader from './Loader.svelte';
+	import { getLocation } from '$lib/location';
+	import { redirect } from '@sveltejs/kit';
+	import { make_maps_url } from '$lib/util';
 
-	const amenity = $page.url.searchParams.get('amenity');
+	const amenity_type = $page.url.searchParams.get('amenity');
 
 	enum State {
 		FETCHING = 2,
 		LOCATION_UNKNOWN = 1,
 		DONE = 0,
-		LOCATION_ERROR = -1,
-		BAD_REQUEST = -2,
-		FAILED_TO_FETCH = -3
+		ERROR = -1
 	}
+	var error = '';
 
 	let state = State.LOCATION_UNKNOWN;
 
 	let amenities: Amenity[] = [];
 
 	// @ts-ignore
-	if (!amenity || amenity_types.indexOf(amenity) == -1) {
-		state = State.BAD_REQUEST;
+	if (!amenity_type || amenity_types.indexOf(amenity_type) == -1) {
+		redirect(307, '/');
 	}
 
-	function fetch() {
+	async function fetch() {
 		state = State.LOCATION_UNKNOWN;
-		if (navigator.permissions && navigator.permissions.query) {
-			navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
-				const permission = result.state;
-				if (permission === 'granted' || permission === 'prompt') {
-					getLocation();
-					return;
-				}
-				state = State.LOCATION_ERROR;
-			});
-		} else if (navigator.geolocation) {
-			getLocation();
-		}
+		const location = await getLocation();
+		state = State.FETCHING;
+		// TODO
+		//@ts-ignore
+		amenities = await load_where(location, amenity_type);
+		state = State.DONE;
 	}
 
-	function getLocation() {
-		navigator.geolocation.getCurrentPosition(
-			(pos) => {
-				state = State.FETCHING;
-				load_where(pos.coords.latitude, pos.coords.longitude, amenity as AmenityKey)
-					.then((a) => {
-						amenities = a;
-						console.log(amenities);
-						state = State.DONE;
-					})
-					.catch((err) => {
-						console.error(err);
-						state = State.FAILED_TO_FETCH;
-					});
-			},
-			(err) => {
-				console.error(err);
-				state = State.LOCATION_ERROR;
-			},
-			{ enableHighAccuracy: true }
-		);
-	}
-
-	const isSafari = browser && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-	function makeUrl(lat: number, lon: number) {
-		if (isSafari) {
-			return `https://maps.apple.com/?daddr=${lat},${lon}`;
-		}
-		return `https://www.google.com/maps/place/${lat},${lon}`;
-	}
 
 	if (browser && state == State.LOCATION_UNKNOWN) {
 		fetch();
 	}
 </script>
 
-
 <main class="max-w-5xl flex flex-col gap-4 w-full">
-	<a href="/" class="text-slate-800 dark:text-slate-500 flex flex-row items-center w-full justify-start gap-2 mb-4">
+	<a
+		href="/"
+		class="text-slate-800 dark:text-slate-500 flex flex-row items-center w-full justify-start gap-2 mb-4"
+	>
 		<ArrowLeft className="stroke-slate-700 dark:stroke-slate-400"></ArrowLeft>
 		Zurück bitte
 	</a>
@@ -90,16 +59,12 @@
 	{#if state == State.LOCATION_UNKNOWN}
 		<h1>Suche Standort</h1>
 		<p class="text-center mb-4">Wo bist du denn??</p>
-		<div
-			class="mx-auto w-12 h-12 rounded-full border-8 border-slate-300 dark:border-slate-800 border-t-green-600 dark:border-t-green-500 animate-spin"
-		/>
+		<Loader />
 	{:else if state == State.FETCHING}
 		<h1>Einen Moment ...</h1>
 		<p class="text-center mb-4">Wir hams gleich</p>
-		<div
-			class="mx-auto w-12 h-12 rounded-full border-8 border-slate-300 dark:border-slate-800 border-t-green-600 dark:border-t-green-500 animate-spin"
-		/>
-	{:else if state == State.FAILED_TO_FETCH}
+		<Loader />
+	{:else if state == State.ERROR}
 		<h1>Die Daten konnten nicht heruntergeladen werden :/</h1>
 		<button on:click={fetch} class="mx-auto rounded px-6 py-3 bg-green-500 text-white"
 			>Vielleicht gehts jetzt</button
@@ -114,11 +79,11 @@
 				<a
 					class="px-5 py-4 flex flex-row items-center gap-4"
 					target="_blank"
-					href={makeUrl(a.lat, a.lon)}
+					href={make_maps_url(a.lat, a.lon)}
 				>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
-						<h2 class="text-xl">{tr(amenity)}</h2>
+						<h2 class="text-xl">{tr(amenity_type)}</h2>
 						{#if a.operator}
 							<p class="mb-1">{a.operator}</p>
 						{/if}
@@ -136,9 +101,7 @@
 		</div>
 	{:else if state == State.DONE && amenities.length == 0}
 		<h1>Nix gefunden</h1>
-	{:else if state == State.BAD_REQUEST}
-		<h1>Irgendwas ist schiefgelaufen :(</h1>
-		<p class="text-center">Das sollte eigentlich nicht passieren.</p>
+		<p>Wo bist du???</p>
 	{/if}
 </main>
 
