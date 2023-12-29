@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { amenities as amenity_types, type AmenityKey } from '$lib';
-	import { tr } from '$lib/translations';
+	import { tr } from '$lib/translations/index';
 	import load_where, { type Amenity } from '$lib/load';
 	import Tag from './Tag.svelte';
 	import ArrowRight from './ArrowRight.svelte';
@@ -35,12 +35,11 @@
 		state = State.LOCATION_UNKNOWN;
 		const location = await getLocation();
 		state = State.FETCHING;
-		// TODO
+		// TODO error handling
 		//@ts-ignore
 		amenities = await load_where(location, amenity_type);
 		state = State.DONE;
 	}
-
 
 	if (browser && state == State.LOCATION_UNKNOWN) {
 		fetch();
@@ -53,16 +52,16 @@
 		class="text-slate-800 dark:text-slate-500 flex flex-row items-center w-full justify-start gap-2 mb-4"
 	>
 		<ArrowLeft className="stroke-slate-700 dark:stroke-slate-400"></ArrowLeft>
-		Zurück bitte
+		{tr("findpage.go_back")}
 	</a>
 
 	{#if state == State.LOCATION_UNKNOWN}
-		<h1>Suche Standort</h1>
-		<p class="text-center mb-4">Wo bist du denn??</p>
+		<h1>{tr('findpage.headings.fetching_location.title')}</h1>
+		<p class="text-center mb-4">{tr('findpage.headings.fetching_location.subtitle')}</p>
 		<Loader />
 	{:else if state == State.FETCHING}
-		<h1>Einen Moment ...</h1>
-		<p class="text-center mb-4">Wir hams gleich</p>
+		<h1>{tr('findpage.headings.fetching_amenities.title')}</h1>
+		<p class="text-center mb-4">{tr('findpage.headings.fetching_amenities.subtitle')}</p>
 		<Loader />
 	{:else if state == State.ERROR}
 		<h1>Die Daten konnten nicht heruntergeladen werden :/</h1>
@@ -70,8 +69,8 @@
 			>Vielleicht gehts jetzt</button
 		>
 	{:else if state == State.DONE && amenities.length > 0}
-		<h1>Sodala :)</h1>
-		<p class="text-center">Frohes Finden</p>
+		<h1>{tr("findpage.headings.done.title")}</h1>
+		<p class="text-center">{tr("findpage.headings.done.subtitle")}</p>
 		<div
 			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
 		>
@@ -83,7 +82,7 @@
 				>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
-						<h2 class="text-xl">{tr(amenity_type)}</h2>
+						<h2 class="text-xl">{tr(`amenities.${amenity_type}`)}</h2>
 						{#if a.operator}
 							<p class="mb-1">{a.operator}</p>
 						{/if}
@@ -100,8 +99,8 @@
 			{/each}
 		</div>
 	{:else if state == State.DONE && amenities.length == 0}
-		<h1>Nix gefunden</h1>
-		<p>Wo bist du???</p>
+		<h1>{tr('findpage.headings.nothing_found.title')}</h1>
+		<p class="text-center">{tr('findpage.headings.nothing_found.subtitle')}</p>
 	{/if}
 </main>
 

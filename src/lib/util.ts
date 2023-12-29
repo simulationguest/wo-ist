@@ -1,4 +1,4 @@
-import { browser } from "$app/environment";
+import { browser } from '$app/environment';
 
 let is_safari = browser && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 

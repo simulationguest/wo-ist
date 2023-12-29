@@ -1,11 +1,11 @@
 <script lang="ts">
-export let name = "";
+	export let name = '';
 	const stringToColour = (str: string) => {
 		let hash = 0;
 		str.split('').forEach((char) => {
 			hash = char.charCodeAt(0) + ((hash << 5) - hash);
 		});
-		return `hsl(${(hash >> 8) & 0xff}, 60%, 40%)`
+		return `hsl(${(hash >> 8) & 0xff}, 60%, 40%)`;
 	};
 </script>
 
