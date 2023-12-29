@@ -69,8 +69,8 @@
 		<Loader />
 	{:else if state == State.Error}
 		<h1>{tr(`error.${error}`)}</h1>
-		<button on:click={fetch} class="button mx-auto"
-			>{tr("findpage.maybe_now")}</button
+		<button on:click={() => window.location.reload()} class="button mx-auto"
+			>{tr('findpage.maybe_now')}</button
 		>
 	{:else if state == State.Done && amenities.length > 0}
 		<h1>{tr('findpage.headings.done.title')}</h1>
