@@ -1,6 +1,10 @@
 <script>
 	import { amenities } from '$lib';
+	import { getLocation } from '$lib/location';
 	import { tr } from '$lib/translations/index';
+	import { onMount } from 'svelte';
+
+	onMount(getLocation);
 </script>
 
 <form class="max-w-7xl flex flex-col items-center gap-8" method="GET" action="/find">

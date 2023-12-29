@@ -1,3 +1,4 @@
+import { page } from '$app/stores';
 import { get, writable } from 'svelte/store';
 
 export type Location = {
