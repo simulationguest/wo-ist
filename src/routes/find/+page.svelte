@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { amenities as amenity_types, type AmenityKey } from '$lib';
 	import { tr } from '$lib/translations/index';
@@ -41,7 +40,7 @@
 		state = State.DONE;
 	}
 
-	if (browser && state == State.LOCATION_UNKNOWN) {
+	if (state == State.LOCATION_UNKNOWN) {
 		fetch();
 	}
 </script>

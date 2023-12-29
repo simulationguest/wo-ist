@@ -1,7 +1,8 @@
 import { get, writable } from 'svelte/store';
-import { Language, translations, type Translation } from './translation';
+import { translations, type Translation, languages } from './translation';
 
-export const currentLanguage = writable<Language>(Language.DE);
+//@ts-ignore
+export const currentLanguage = writable<(typeof languages)[number]>(getLanguage() || 'en');
 
 function getRandomInt(max: number): number {
 	return Math.floor(Math.random() * max);
@@ -18,4 +19,17 @@ export function tr(key: string): string {
 		return translated[getRandomInt(translated.length)];
 	}
 	return translated as string;
+}
+
+function getLanguage() {
+	if (navigator.languages != undefined) {
+		// @ts-ignore;
+		return navigator.languages.map(x => x.trim().slice(0, 2)).find((id) => languages.includes(id)) || navigator.language;
+	};
+	return navigator.language;
+}
+
+export function setLanguage() {
+	//@ts-ignore
+	currentLanguage.set(getLanguage() || 'en');
 }
