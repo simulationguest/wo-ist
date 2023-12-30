@@ -22,7 +22,6 @@
 	}
 	let error: AppError | null = null;
 
-	$: console.log(error);
 	let state = State.LocationUnknown;
 
 	let amenities: Amenity[] = [];

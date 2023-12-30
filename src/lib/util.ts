@@ -9,11 +9,12 @@ export const MapProviders = { 'osm': 'OSM', 'google': 'Google Maps', 'apple': 'A
 
 type MapProvider = keyof typeof MapProviders;
 
-export const mapProvider = writable<MapProvider>(browser && localStorage.getItem("map_provider") as MapProvider || isSafari() ? 'apple' : 'google');
+export const mapProvider = writable<MapProvider>(browser && localStorage.getItem("map_provider") as MapProvider || 'google');
 mapProvider.subscribe(provider => localStorage.setItem("map_provider", provider));
 
 export function makeMapsURL({ location: { lat, lon }, osm: { id, type } }: Amenity) {
 	switch (get(mapProvider)) {
+
 		case 'apple':
 			return `https://maps.apple.com/?daddr=${lat},${lon}`;
 		case 'osm':
