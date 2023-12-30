@@ -89,7 +89,7 @@
 				<a
 					class="px-5 py-4 flex flex-row items-center gap-4"
 					target="_blank"
-					href={makeMapsURL(a)}
+					href={makeMapsURL($mapProvider, a)}
 				>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
