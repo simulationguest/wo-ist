@@ -9,6 +9,6 @@
 	};
 </script>
 
-<div class="px-1 rounded" style="background-color: {stringToColour(name)}">
+<div class="px-1 rounded text-white" style="background-color: {stringToColour(name)}">
 	{name}
 </div>

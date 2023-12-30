@@ -83,7 +83,7 @@
 		<h1>{tr('findpage.headings.done.title')}</h1>
 		<p class="text-center">{tr('findpage.headings.done.subtitle')}</p>
 		<div
-			class="rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600 w-full"
+			class="rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 divide-y divide-slate-300 dark:divide-slate-600 w-full"
 		>
 			{#each amenities as a}
 				<a

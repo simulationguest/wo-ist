@@ -14,7 +14,7 @@
 		</h1>
 		<p class="text-3xl text-center leading-relaxed">
 			{tr('homepage.where_is')}
-			<select name="amenity" class="dark:bg-gray-700 px-1 py-0.5 rounded">
+			<select name="amenity" class="bg-slate-200 border border-slate-300 dark:bg-gray-700 px-1 py-0.5 rounded">
 				{#each amenities as amenity}
 					<option value={amenity}>{tr(`homepage.amenities.${amenity}`)}</option>
 				{/each}
