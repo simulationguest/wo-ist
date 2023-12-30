@@ -15,4 +15,7 @@
 	.min-h-x {
 		min-height: calc(100vh - 40px);
 	}
+	.min-h-y {
+		min-height: calc(100vh - 120px);
+	}
 }

@@ -21,6 +21,8 @@
 		Error,
 	}
 	let error: AppError | null = null;
+
+	$: console.log(error);
 	let state = State.LocationUnknown;
 
 	let amenities: Amenity[] = [];
@@ -29,7 +31,7 @@
 		redirect(307, '/');
 	}
 
-	async function fetch() {
+	async function load() {
 		try {
 			state = State.LocationUnknown;
 			const location = (await getLocation()).location;
@@ -38,15 +40,15 @@
 			amenities = await load_where(location, type);
 			state = State.Done;
 		} catch (err) {
-			state = State.Error;
-			console.error(err);
 			// @ts-ignore
 			error = err;
+			state = State.Error;
+			console.error(err);
 		}
 	}
 
 	if (state == State.LocationUnknown) {
-		fetch();
+		load();
 	}
 </script>
 
@@ -64,7 +66,7 @@
 			<option value={key}>{val}</option>{/each}
 	</select>
 </header>
-<main class="max-w-5xl mx-auto flex flex-col gap-4 w-full">
+<main class="max-w-5xl min-h-y mx-auto flex flex-col gap-4 w-full p-4">
 	{#if state == State.LocationUnknown}
 		<h1>{tr('findpage.headings.fetching_location.title')}</h1>
 		<p class="text-center mb-4">{tr('findpage.headings.fetching_location.subtitle')}</p>

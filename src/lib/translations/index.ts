@@ -18,6 +18,7 @@ export function tr(key: string): string {
 	if (Array.isArray(translated)) {
 		return translated[getRandomInt(translated.length)];
 	}
+	console.log(key, translated);
 	return translated as string;
 }
 

@@ -9,7 +9,7 @@
 
 <div class="bg-slate-100 dark:bg-slate-900 dark:text-white min-h-screen w-full">
 	<slot />
+	<footer class="text-center dark:text-slate-600">
+		<a href="https://github.com/simulationguest/wo-ist">Source code</a>
+	</footer>	
 </div>
-<footer class="text-center dark:text-slate-600">
-	<a href="https://github.com/simulationguest/wo-ist">Source code</a>
-</footer>

@@ -1,3 +1,4 @@
+import { applyAction } from '$app/forms';
 import { type AmenityKey } from '$lib/amenities';
 import AppError from './error';
 import type { Location } from './location';
@@ -131,12 +132,10 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 }
 
 export default async function load_where(location: Location, type: AmenityKey) {
-	try {
-		return load_where_internal(location, type);
-	} catch (error) {
-		console.error('Failed to fetch ' + type);
-		throw AppError.FailedToFetchAmenities;
-	}
+	return load_where_internal(location, type).catch(err => {
+		console.error(err);
+		return Promise.reject(AppError.FailedToFetchAmenities);
+	});
 }
 
 function toilet_genders(tags: any) {
