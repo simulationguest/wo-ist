@@ -9,10 +9,10 @@
 	import Loader from './Loader.svelte';
 	import { getLocation } from '$lib/location';
 	import { redirect } from '@sveltejs/kit';
-	import { make_maps_url } from '$lib/util';
+	import { makeMapsURL, mapProvider, MapProviders } from '$lib/util';
 	import AppError from '$lib/error';
 
-	const amenity_type = $page.url.searchParams.get('amenity');
+	const type = $page.url.searchParams.get('amenity');
 
 	enum State {
 		LocationUnknown,
@@ -25,7 +25,7 @@
 
 	let amenities: Amenity[] = [];
 
-	if (!isAmenity(amenity_type)) {
+	if (!isAmenity(type)) {
 		redirect(307, '/');
 	}
 
@@ -35,7 +35,7 @@
 			const location = (await getLocation()).location;
 			state = State.Fetching;
 			//@ts-ignore
-			amenities = await load_where(location, amenity_type);
+			amenities = await load_where(location, type);
 			state = State.Done;
 		} catch (err) {
 			state = State.Error;
@@ -50,15 +50,21 @@
 	}
 </script>
 
-<main class="max-w-5xl flex flex-col gap-4 w-full">
+<header class="top-bar">
 	<a
 		href="/"
-		class="text-slate-800 dark:text-slate-500 flex flex-row items-center w-full justify-start gap-2 mb-4"
+		class="text-slate-800 dark:text-slate-500 flex flex-row items-center justify-start gap-2"
 	>
 		<ArrowLeft className="stroke-slate-700 dark:stroke-slate-400"></ArrowLeft>
 		{tr('findpage.go_back')}
 	</a>
 
+	<select bind:value={$mapProvider} class="px-1 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">
+		{#each Object.entries(MapProviders) as [key, val]}
+			<option value={key}>{val}</option>{/each}
+	</select>
+</header>
+<main class="max-w-5xl mx-auto flex flex-col gap-4 w-full">
 	{#if state == State.LocationUnknown}
 		<h1>{tr('findpage.headings.fetching_location.title')}</h1>
 		<p class="text-center mb-4">{tr('findpage.headings.fetching_location.subtitle')}</p>
@@ -82,11 +88,11 @@
 				<a
 					class="px-5 py-4 flex flex-row items-center gap-4"
 					target="_blank"
-					href={make_maps_url(a.lat, a.lon)}
+					href={makeMapsURL(a)}
 				>
 					<div>{Math.round(a.distance)}m</div>
 					<div>
-						<h2 class="text-xl">{tr(`amenities.${amenity_type}`)}</h2>
+						<h2 class="text-xl">{tr(`amenities.${type}`)}</h2>
 						{#if a.operator}
 							<p class="mb-1">{a.operator}</p>
 						{/if}

@@ -11,12 +11,6 @@ type UserLocation = { location: Location; lastUpdated: number };
 
 export const currentLocation = writable<Promise<UserLocation>>(fetchLocation());
 
-export enum LocationError {
-	PermissionDenied = 'permission denied',
-	NoGeolocationAPI = 'no geolocation api',
-	FailedToFetch = 'failed to fetch',
-}
-
 async function fetchLocation(): Promise<UserLocation> {
 	console.log("Called")
 	if (navigator.permissions && navigator.permissions.query) {

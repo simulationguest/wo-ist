@@ -4,11 +4,14 @@ import type { Location } from './location';
 import { tr } from './translations';
 
 export interface Amenity {
-	lat: number;
-	lon: number;
+	location: Location,
 	distance: number;
 	operator?: string;
 	tags: string[];
+	osm: {
+		type: any;
+		id: any;
+	}
 }
 
 async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
@@ -38,9 +41,9 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 		case 'kebab':
 			queryBody = `nwr${filterAccess}[cuisine=kebab];`;
 			break;
-		case 'trash':
-			queryBody = `( nwr${filterAccess}[amenity=waste_disposal]; nwr${filterAccess}[amenity=waste_basket]; );`
-			break;
+		//case 'trash':
+		//	queryBody = `( nwr${filterAccess}[amenity=waste_disposal]; nwr${filterAccess}[amenity=waste_basket]; );`
+		//	break;
 	}
 
 	queryBody = `[out:json];${queryBody}out center;`;
@@ -62,11 +65,17 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 		const elLon = el.lon ?? el.center.lon;
 
 		let amenity: Amenity = {
-			lat: elLat,
-			lon: elLon,
+			location: {
+				lat: elLat,
+				lon: elLon,
+			},
 			distance: distance(lat, lon, elLat, elLon),
 			operator: el.tags.operator,
 			tags: [],
+			osm: {
+				id: el.id,
+				type: el.type,
+			}
 		};
 
 		if (el.tags.wheelchair === 'yes') amenity.tags.push(tr('tags.wheelchair_friendly'));

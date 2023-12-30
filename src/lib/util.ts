@@ -1,8 +1,24 @@
-let is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+import { browser } from "$app/environment";
+import { get, writable } from "svelte/store";
+import type { Location } from "./location";
+import type { Amenity } from "./load";
 
-export function make_maps_url(lat: number, lon: number) {
-	if (is_safari) {
-		return `https://maps.apple.com/?daddr=${lat},${lon}`;
+let isSafari = () => browser && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+export const MapProviders = { 'osm': 'OSM', 'google': 'Google Maps', 'apple': 'Apple Maps' } as const;
+
+type MapProvider = keyof typeof MapProviders;
+
+export const mapProvider = writable<MapProvider>(browser && localStorage.getItem("map_provider") as MapProvider || isSafari() ? 'apple' : 'google');
+mapProvider.subscribe(provider => localStorage.setItem("map_provider", provider));
+
+export function makeMapsURL({ location: { lat, lon }, osm: { id, type } }: Amenity) {
+	switch (get(mapProvider)) {
+		case 'apple':
+			return `https://maps.apple.com/?daddr=${lat},${lon}`;
+		case 'osm':
+			return `https://openstreetmap.org/${type}/${id}`;
+		default:
+			return `https://www.google.com/maps/place/${lat},${lon}`;
 	}
-	return `https://www.google.com/maps/place/${lat},${lon}`;
 }
