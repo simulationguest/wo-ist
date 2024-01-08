@@ -3,6 +3,7 @@ const DE = {
 	homepage: {
 		where_is: 'Wo ist denn',
 		amenities: {
+			coffee: 'ein Kaffee',
 			atm: 'ein Geldautomat',
 			drinking_water: 'Trinkwasser',
 			toilet: 'eine Toilette',
@@ -33,6 +34,7 @@ const DE = {
 		irish_themed: 'Irish Themed',
 	},
 	amenities: {
+		coffee: 'Kaffee',
 		atm: 'Geldautomat',
 		drinking_water: 'Trinkwasser',
 		toilet: 'Toilette',

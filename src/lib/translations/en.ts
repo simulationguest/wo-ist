@@ -5,6 +5,7 @@ const EN: Translation = {
 	homepage: {
 		where_is: 'Where is',
 		amenities: {
+			coffee: 'a coffee',
 			atm: 'an ATM',
 			drinking_water: 'drinking water',
 			toilet: 'a toilet',
@@ -35,6 +36,7 @@ const EN: Translation = {
 		irish_themed: 'irish themed',
 	},
 	amenities: {
+		coffee: 'coffee',
 		atm: 'ATM',
 		drinking_water: 'drinking water',
 		toilet: 'toilette',

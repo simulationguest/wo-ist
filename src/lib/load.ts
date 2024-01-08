@@ -21,6 +21,9 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 
 	let queryBody;
 	switch (type) {
+		case 'coffee':
+			queryBody = `( nwr${filterAccess}[shop="coffee"]; nwr${filterAccess}[amenity="cafe"]; nwr${filterAccess}["drink:coffee"=yes]; nwr${filterAccess}[vending=coffee]; );`;
+			break;
 		case 'drinking_water':
 			queryBody = `nwr${filterAccess}[amenity="drinking_water"];`;
 			break;
@@ -83,6 +86,11 @@ async function load_where_internal({ lat, lon }: Location, type: AmenityKey) {
 		else if (el.tags.wheelchair === 'no') amenity.tags.push(tr('tags.wheelchair_unfriendly'));
 
 		switch (type) {
+			case 'coffee':
+				if (el.tags['vending'] === 'coffee') {
+					amenity.tags.push("Automat");
+				}
+				break;
 			case 'drinking_water':
 				if (el.tags['drinking_water:legal'] === 'yes') {
 					amenity.tags.push(tr('tags.explicitly_legal'));
