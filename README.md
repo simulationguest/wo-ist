@@ -2,7 +2,7 @@
 
 An small app to quickly find local amenities, such as ATMs, toilets or Kebab stands.
 
-<img height="300" alt="screenshot" src="./screenshot.png">
+<img height="450" alt="screenshot" src="./screenshot.png">
 
 ## Run it yourself
 
