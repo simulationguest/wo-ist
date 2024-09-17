@@ -6,7 +6,7 @@ An small app to quickly find local amenities, such as ATMs, toilets or Kebab sta
 
 ## Run it yourself
 
-This project requires [pnpm](https://pnpm.io/).
+This project requires [pnpm](https://pnpm.io/). Install it before proceeding with the steps below.
 
 ### Step 1: Installing dependencies
 
